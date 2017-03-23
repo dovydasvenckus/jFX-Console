@@ -8,17 +8,21 @@ import javafx.scene.control.Button
 import javafx.scene.control.TextArea
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.text.Text
 import javafx.stage.Modality
 import javafx.stage.Stage
 
 
 class MainWindowController {
+    @FXML var mainPane: BorderPane? = null
     @FXML var mBeansTree: TreeView<MBeanTreeNode>? = null
     @FXML var methodsVBox: VBox? = null
 
     fun initialize() {
-        methodsVBox!!.padding = Insets(10.0)
+        BorderPane.setMargin(methodsVBox, Insets(20.0, 0.0, 0.0, 20.0))
     }
 
     fun initTree(primaryStage: Stage, jmxConnector: JMXConnector) {
@@ -33,11 +37,15 @@ class MainWindowController {
                 val objectName = newValue.value.getObjectName()
                 val mbeanInfo = jmxConnector.getMbeanInfo(newValue.value.getObjectName())
                 mbeanInfo.operations.filter { it.signature.isEmpty() }.forEach { operation ->
+                    val textButtonCombo = HBox(20.0)
+                    val text = Text(operation.returnType)
                     val button = Button(operation.name)
+                    textButtonCombo.children.add(text)
+                    textButtonCombo.children.add(button)
                     button.setOnAction({
                         createPopup(jmxConnector.invoke(objectName, operation.name), primaryStage)
                     })
-                    methodsVBox!!.children.add(button)
+                    methodsVBox!!.children.add(textButtonCombo)
                 }
             }
         })
@@ -78,7 +86,6 @@ class MainWindowController {
         dialog.maxWidth = 800.0
         dialog.initModality(Modality.APPLICATION_MODAL)
         val dialogVbox = VBox(20.0)
-        dialogVbox.padding = Insets(5.0)
         val textBox = TextArea(mesage)
         textBox.setEditable(false)
         dialogVbox.children.add(textBox)
