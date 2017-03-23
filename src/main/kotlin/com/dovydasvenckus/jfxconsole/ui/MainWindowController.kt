@@ -23,6 +23,7 @@ class MainWindowController {
 
     fun initialize() {
         BorderPane.setMargin(methodsVBox, Insets(20.0, 0.0, 0.0, 20.0))
+        mBeansTree!!.isShowRoot = false
     }
 
     fun initTree(primaryStage: Stage, jmxConnector: JMXConnector) {
