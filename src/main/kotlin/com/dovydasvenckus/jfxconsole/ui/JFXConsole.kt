@@ -9,10 +9,17 @@ import javafx.stage.Stage
 
 
 class JFXConsole : Application() {
-    override fun start(stage: Stage) {
-        val root = FXMLLoader.load<Parent>(javaClass.classLoader.getResource("templates/main.fxml"))
+    var mainController: MainWindowController? = null
 
+    override fun start(stage: Stage) {
+        val loader = FXMLLoader(javaClass.classLoader.getResource("templates/main.fxml"))
+        val root = loader.load<Parent>()
+
+        mainController = loader.getController()
         val scene = Scene(root, 300.0, 250.0)
+
+        val connector = JMXConnector("localhost", 1234)
+        mainController!!.initTree(connector.getMbeansNames())
 
         stage.title = "jFX Console!"
         stage.scene = scene
@@ -20,8 +27,6 @@ class JFXConsole : Application() {
     }
 
     fun init(args: Array<String>) {
-        val connector = JMXConnector("localhost", 1234)
-        println(connector.getMbeansNames())
         launch(*args)
     }
 }
