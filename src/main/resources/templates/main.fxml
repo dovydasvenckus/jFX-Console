@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Text?>
 <?import javafx.scene.control.TreeView?>
-<StackPane xmlns="http://javafx.com/javafx"
-           xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.dovydasvenckus.jfxconsole.ui.MainWindowController"
-           prefHeight="400.0" prefWidth="600.0">
-
-    <Text fx:id="textField"/>
-    <TreeView fx:id="mBeansTree"/>
-</StackPane>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.dovydasvenckus.jfxconsole.ui.MainWindowController"
+            prefHeight="400.0" prefWidth="600.0">
+    <left>
+        <TreeView fx:id="mBeansTree"/>
+    </left>
+    <center>
+        <VBox fx:id="methodsVBox"/>
+    </center>
+</BorderPane>
