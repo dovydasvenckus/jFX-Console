@@ -1,12 +1,13 @@
 package com.dovydasvenckus.jfxconsole.ui
 
+import com.dovydasvenckus.jfxconsole.domain.MBeanNode
 import com.dovydasvenckus.jfxconsole.jmx.JMXConnector
+import com.dovydasvenckus.jfxconsole.ui.helper.MBeanTreeMapper
 import javafx.fxml.FXML
 import javafx.geometry.Insets
 import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.TextArea
-import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
@@ -18,7 +19,7 @@ import javafx.stage.Stage
 
 class MainWindowController {
     @FXML var mainPane: BorderPane? = null
-    @FXML var mBeansTree: TreeView<MBeanTreeNode>? = null
+    @FXML var mBeansTree: TreeView<MBeanNode>? = null
     @FXML var methodsVBox: VBox? = null
 
     fun initialize() {
@@ -29,53 +30,30 @@ class MainWindowController {
     fun initTree(primaryStage: Stage, jmxConnector: JMXConnector) {
         val mBeanNames = jmxConnector.getMBeansNames()
 
-        val rootNode = TreeItem(MBeanTreeNode("root", "root"))
+        val rootNode = MBeanTreeMapper().getMapRootNode(mBeanNames)
         mBeansTree!!.selectionModel.selectedItemProperty().addListener({
             observable, oldValue, newValue ->
-            if (observable.value.isLeaf) {
-                methodsVBox!!.children.clear()
+            methodsVBox!!.children.clear()
 
-                val objectName = newValue.value.getObjectName()
-                val mbeanInfo = jmxConnector.getMbeanInfo(newValue.value.getObjectName())
-                mbeanInfo.operations.filter { it.signature.isEmpty() }.forEach { operation ->
-                    val textButtonCombo = HBox(20.0)
-                    val text = Text(operation.returnType)
-                    val button = Button(operation.name)
-                    textButtonCombo.children.add(text)
-                    textButtonCombo.children.add(button)
-                    button.setOnAction({
-                        createPopup(jmxConnector.invoke(objectName, operation.name), primaryStage)
-                    })
-                    methodsVBox!!.children.add(textButtonCombo)
+            if (observable.value.isLeaf) {
+
+                val objectName = newValue.value.objectName
+                if (objectName != null) {
+                    val mbeanInfo = jmxConnector.getMbeanInfo(objectName)
+                    mbeanInfo.operations.filter { it.signature.isEmpty() }.forEach { operation ->
+                        val textButtonCombo = HBox(20.0)
+                        val text = Text(operation.returnType)
+                        val button = Button(operation.name)
+                        textButtonCombo.children.add(text)
+                        textButtonCombo.children.add(button)
+                        button.setOnAction({
+                            createPopup(jmxConnector.invoke(objectName, operation.name), primaryStage)
+                        })
+                        methodsVBox!!.children.add(textButtonCombo)
+                    }
                 }
             }
         })
-
-        rootNode.setExpanded(true)
-        mBeanNames.groupBy {
-            it.domain
-        }.forEach {
-            val domainNode = TreeItem(MBeanTreeNode(it.key, it.key))
-            it.value.groupBy { it.getKeyProperty("type") }.forEach {
-                val typeNode = TreeItem(MBeanTreeNode(domainNode.value.domain, it.key, it.key))
-                domainNode.children.add(typeNode)
-
-                if (it.value[0].getKeyProperty("name") != null) {
-                    it.value.forEach {
-                        val leafNode = TreeItem(
-                                MBeanTreeNode(
-                                        typeNode.value.domain,
-                                        it.getKeyProperty("name"),
-                                        it.getKeyProperty("type"),
-                                        it.getKeyProperty("name")))
-                        typeNode.children.add(leafNode)
-                    }
-                }
-
-            }
-
-            rootNode.children.add(domainNode)
-        }
 
         mBeansTree!!.root = rootNode
     }
