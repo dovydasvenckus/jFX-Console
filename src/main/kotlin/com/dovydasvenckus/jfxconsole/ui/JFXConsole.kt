@@ -20,7 +20,7 @@ class JFXConsole : Application() {
         mainController = loader.getController()
         val scene = Scene(root, 800.0, 800.0)
 
-        mainController!!.initTree(stage, connector)
+        mainController!!.initTree(connector)
 
         stage.title = "jFX Console!"
         stage.scene = scene
