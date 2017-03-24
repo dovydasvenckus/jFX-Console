@@ -10,6 +10,8 @@ import javafx.geometry.Insets
 import javafx.scene.control.TreeView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
+import javax.management.MBeanOperationInfo
+import javax.management.ObjectName
 
 
 class MainWindowController {
@@ -17,36 +19,51 @@ class MainWindowController {
     @FXML var mBeansTree: TreeView<MBeanNode>? = null
     @FXML var methodsVBox: VBox? = null
 
+    var jmxConnector: JMXConnector? = null
+
     fun initialize() {
         BorderPane.setMargin(methodsVBox, Insets(20.0, 0.0, 0.0, 20.0))
         mBeansTree!!.isShowRoot = false
     }
 
     fun initTree(jmxConnector: JMXConnector) {
+        this.jmxConnector = jmxConnector
         val mBeanNames = jmxConnector.getMBeansNames()
 
         val rootNode = MBeanTreeMapper().getMapRootNode(mBeanNames)
-        mBeansTree!!.selectionModel.selectedItemProperty().addListener({
-            observable, oldValue, newValue ->
-            methodsVBox!!.children.clear()
-
-            if (observable.value.isLeaf) {
-
-                val objectName = newValue.value.objectName
-                if (objectName != null) {
-                    val mbeanInfo = jmxConnector.getMbeanInfo(objectName)
-                    mbeanInfo.operations.filter { it.signature.isEmpty() && it.returnType == "java.lang.String" }.forEach { operation ->
-                        val button = MethodButton(operation.returnType, operation.name,
-                                Runnable {
-                                    val result = jmxConnector.invoke(objectName, operation.name)
-                                    MethodInvocationAlert(operation.name, result).showAndWait()
-                                })
-                        methodsVBox!!.children.add(button)
-                    }
-                }
-            }
-        })
+        initOnClickCallBacks()
 
         mBeansTree!!.root = rootNode
+    }
+
+    private fun initOnClickCallBacks() {
+        mBeansTree!!.selectionModel.selectedItemProperty().addListener({ observable, oldValue, newValue ->
+            methodsVBox!!.children.clear()
+            val objectName = newValue.value.objectName
+
+            if (observable.value.isLeaf && objectName != null) {
+                setupOperations(objectName)
+            }
+
+        })
+    }
+
+    private fun setupOperations(objectName: ObjectName) {
+        val mbeanInfo = jmxConnector!!.getMbeanInfo(objectName)
+        mbeanInfo.operations.filter { operationsWithoutParamsAndStringReturn(it) }.forEach { operation ->
+            methodsVBox!!.children.add(createOperationButton(objectName, operation))
+        }
+    }
+
+    private fun operationsWithoutParamsAndStringReturn(it: MBeanOperationInfo): Boolean {
+        return it.signature.isEmpty() && it.returnType == "java.lang.String"
+    }
+
+    private fun createOperationButton(objectName: ObjectName, operation: MBeanOperationInfo): MethodButton {
+        return MethodButton(operation.returnType, operation.name,
+                Runnable {
+                    val result = jmxConnector!!.invoke(objectName, operation.name)
+                    MethodInvocationAlert(operation.name, result).showAndWait()
+                })
     }
 }
