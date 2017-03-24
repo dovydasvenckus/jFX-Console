@@ -29,5 +29,6 @@ class JFXConsole : Application() {
 
     fun init(args: Array<String>) {
         launch(*args)
+        connector.close()
     }
 }

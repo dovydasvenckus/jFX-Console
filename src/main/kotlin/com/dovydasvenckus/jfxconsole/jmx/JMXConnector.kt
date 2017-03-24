@@ -8,39 +8,25 @@ import javax.management.remote.JMXServiceURL
 class JMXConnector(host: String, port: Int) {
 
     val url = JMXServiceURL("service:jmx:rmi:///jndi/rmi://$host:$port/jmxrmi")
+    val jmxConnector = JMXConnectorFactory.connect(url)
+    val mbeanServerConnection = jmxConnector.mBeanServerConnection
 
-    fun getMBeansNames() : List<ObjectName> {
-        val jmxConnector = JMXConnectorFactory.connect(url)
-        val mbeanServerConnection = jmxConnector.mBeanServerConnection
-        
-        val mbeanNames = mbeanServerConnection.domains.flatMap {
+    fun getMBeansNames(): List<ObjectName> {
+        return mbeanServerConnection.domains.flatMap {
             mbeanServerConnection.queryNames(ObjectName("$it:*"), null)
         }
-
-        jmxConnector.close()
-        return mbeanNames
     }
 
-    fun getMbeanInfo(name : ObjectName) : MBeanInfo {
-        val jmxConnector = JMXConnectorFactory.connect(url)
-        val mbeanServerConnection = jmxConnector.mBeanServerConnection
-
-        val mbeanInfo = mbeanServerConnection.getMBeanInfo(name)
-
-        jmxConnector.close()
-
-        return mbeanInfo
+    fun getMbeanInfo(name: ObjectName): MBeanInfo {
+        return mbeanServerConnection.getMBeanInfo(name)
     }
 
-    fun invoke(name: ObjectName, functionName: String) : String  {
-        val jmxConnector = JMXConnectorFactory.connect(url)
-        val mbeanServerConnection = jmxConnector.mBeanServerConnection
+    fun invoke(name: ObjectName, functionName: String): Any? {
+        return mbeanServerConnection.invoke(name, functionName, emptyArray<Any>(), emptyArray<String>())
+    }
 
-        val invocationResult = mbeanServerConnection.invoke(name, functionName, emptyArray<Any>(), emptyArray<String>())
-
+    fun close() {
         jmxConnector.close()
-
-        return invocationResult.toString()
     }
 
 }

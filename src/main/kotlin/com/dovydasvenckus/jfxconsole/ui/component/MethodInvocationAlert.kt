@@ -4,15 +4,21 @@ import javafx.scene.control.Alert
 import javafx.scene.control.Alert.AlertType.INFORMATION
 import javafx.scene.control.TextArea
 
-class MethodInvocationAlert(method : String, result : String) : Alert(INFORMATION) {
+class MethodInvocationAlert(method : String, result : Any?, void: Boolean = false) : Alert(INFORMATION) {
 
     init {
         title = method
-        headerText = "Result:"
-        val textArea = TextArea(result)
-        textArea.setEditable(false)
-        textArea.setWrapText(true)
 
-        dialogPane.content = textArea
+        if (!void) {
+            headerText = "Result:"
+            val textArea = TextArea(result?.toString() ?: "null")
+            textArea.setEditable(false)
+            textArea.setWrapText(true)
+
+            dialogPane.content = textArea
+        }
+        else {
+            headerText = "Method successfully invoked"
+        }
     }
 }

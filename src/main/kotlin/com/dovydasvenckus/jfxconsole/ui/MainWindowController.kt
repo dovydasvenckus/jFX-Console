@@ -56,14 +56,14 @@ class MainWindowController {
     }
 
     private fun operationsWithoutParamsAndStringReturn(it: MBeanOperationInfo): Boolean {
-        return it.signature.isEmpty() && it.returnType == "java.lang.String"
+        return it.signature.isEmpty()
     }
 
     private fun createOperationButton(objectName: ObjectName, operation: MBeanOperationInfo): MethodButton {
         return MethodButton(operation.returnType, operation.name,
                 Runnable {
                     val result = jmxConnector!!.invoke(objectName, operation.name)
-                    MethodInvocationAlert(operation.name, result).showAndWait()
+                    MethodInvocationAlert(operation.name, result, operation.returnType == "void").showAndWait()
                 })
     }
 }
