@@ -50,20 +50,20 @@ class MainWindowController {
 
     private fun setupOperations(objectName: ObjectName) {
         val mbeanInfo = jmxConnector!!.getMbeanInfo(objectName)
-        mbeanInfo.operations.filter { operationsWithoutParamsAndStringReturn(it) }.forEach { operation ->
+        mbeanInfo.operations.filter { it.signature.isEmpty() }.forEach { operation ->
             methodsVBox!!.children.add(createOperationButton(objectName, operation))
         }
     }
 
-    private fun operationsWithoutParamsAndStringReturn(it: MBeanOperationInfo): Boolean {
-        return it.signature.isEmpty()
-    }
-
     private fun createOperationButton(objectName: ObjectName, operation: MBeanOperationInfo): MethodButton {
-        return MethodButton(operation.returnType, operation.name,
+        return MethodButton(getMethodName(operation), operation.name,
                 Runnable {
                     val result = jmxConnector!!.invoke(objectName, operation.name)
                     MethodInvocationAlert(operation.name, result, operation.returnType == "void").showAndWait()
                 })
+    }
+
+    private fun getMethodName(operation: MBeanOperationInfo) : String{
+        return operation.returnType.replace("java.lang.", "")
     }
 }
