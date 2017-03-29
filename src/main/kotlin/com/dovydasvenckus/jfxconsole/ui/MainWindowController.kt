@@ -56,14 +56,10 @@ class MainWindowController {
     }
 
     private fun createOperationButton(objectName: ObjectName, operation: MBeanOperationInfo): MethodButton {
-        return MethodButton(getMethodName(operation), operation.name,
+        return MethodButton(operation,
                 Runnable {
                     val result = jmxConnector!!.invoke(objectName, operation.name)
                     MethodInvocationAlert(operation.name, result, operation.returnType == "void").showAndWait()
                 })
-    }
-
-    private fun getMethodName(operation: MBeanOperationInfo) : String{
-        return operation.returnType.replace("java.lang.", "")
     }
 }

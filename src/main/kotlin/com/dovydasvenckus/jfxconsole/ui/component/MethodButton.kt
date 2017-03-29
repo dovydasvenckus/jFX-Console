@@ -3,15 +3,20 @@ package com.dovydasvenckus.jfxconsole.ui.component
 import javafx.scene.control.Button
 import javafx.scene.layout.HBox
 import javafx.scene.text.Text
+import javax.management.MBeanOperationInfo
 
-class MethodButton(returnType: String, methodName: String, callback: Runnable) : HBox(20.0) {
+class MethodButton(operation: MBeanOperationInfo, callback: Runnable) : HBox(20.0) {
 
     init {
-        val button = Button(methodName)
+        val button = Button(operation.name)
         button.setOnAction { callback.run() }
 
-        this.children.add(Text(returnType))
+        this.children.add(Text(getReturnTypeName(operation)))
         this.children.add(button)
+    }
+
+    private fun getReturnTypeName(operation: MBeanOperationInfo) : String{
+        return operation.returnType.replace("java.lang.", "")
     }
 
 }
