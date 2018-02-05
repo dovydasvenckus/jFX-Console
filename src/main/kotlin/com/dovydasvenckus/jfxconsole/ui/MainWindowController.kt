@@ -50,7 +50,7 @@ class MainWindowController {
 
     private fun setupOperations(objectName: ObjectName) {
         val mbeanInfo = jmxConnector!!.getMbeanInfo(objectName)
-        mbeanInfo.operations.filter { it.signature.isEmpty() }.forEach { operation ->
+        mbeanInfo.operations.forEach { operation ->
             methodsVBox!!.children.add(createOperationButton(objectName, operation))
         }
     }

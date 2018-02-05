@@ -7,9 +7,9 @@ import javax.management.remote.JMXServiceURL
 
 class JMXConnector(host: String, port: Int) {
 
-    val url = JMXServiceURL("service:jmx:rmi:///jndi/rmi://$host:$port/jmxrmi")
-    val jmxConnector = JMXConnectorFactory.connect(url)
-    val mbeanServerConnection = jmxConnector.mBeanServerConnection
+    private val url = JMXServiceURL("service:jmx:rmi:///jndi/rmi://$host:$port/jmxrmi")
+    private val jmxConnector = JMXConnectorFactory.connect(url)
+    private val mbeanServerConnection = jmxConnector.mBeanServerConnection
 
     fun getMBeansNames(): List<ObjectName> {
         return mbeanServerConnection.domains.flatMap {
