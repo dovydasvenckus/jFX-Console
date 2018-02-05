@@ -1,6 +1,10 @@
 .idea
-gradle
+*.iml
 
+.gradle
+
+build
+out
 *.class
 
 # Mobile Tools for Java (J2ME)
