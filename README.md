@@ -1,4 +1,5 @@
 # jFX-Console
+[![Run Status](https://api.shippable.com/projects/59fe1aafe07b7707001c66df/badge?branch=master)](https://app.shippable.com/github/dovydasvenckus/jFX-Console) 
 
 ## Starting fake JMX server
 In this project fake mBean server is provided.
