@@ -4,6 +4,8 @@ public interface BatchProcessorMBean {
 
     void execute();
 
+    int execute(String jobName);
+
     String getName();
 
     int batchSize();

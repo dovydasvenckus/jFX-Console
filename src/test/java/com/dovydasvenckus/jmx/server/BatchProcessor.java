@@ -13,7 +13,16 @@ public class BatchProcessor implements BatchProcessorMBean {
 
     @Override
     public void execute() {
-        return;
+        System.out.println("Executing batch processor");
+    }
+
+    @Override
+    public int execute(String jobName) {
+        if (jobName.equals("sendEmails")) {
+            return 500;
+        }
+
+        return 0;
     }
 
     @Override
