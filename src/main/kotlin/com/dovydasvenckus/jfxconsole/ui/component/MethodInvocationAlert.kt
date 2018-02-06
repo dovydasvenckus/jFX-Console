@@ -12,8 +12,8 @@ class MethodInvocationAlert(method : String, result : Any?, void: Boolean = fals
         if (!void) {
             headerText = "Result:"
             val textArea = TextArea(result?.toString() ?: "null")
-            textArea.setEditable(false)
-            textArea.setWrapText(true)
+            textArea.isEditable = false
+            textArea.isWrapText = true
 
             dialogPane.content = textArea
         }

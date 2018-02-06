@@ -16,7 +16,7 @@ class MethodButton(operation: MBeanOperationInfo, callback: Runnable) : HBox(20.
         this.children.add(button)
 
         operation.signature.forEach {
-            this.children.add(Text(it.type))
+            this.children.add(Text(getReturnTypeName(it.type)))
             this.children.add(TextField(it.name))
         }
     }
