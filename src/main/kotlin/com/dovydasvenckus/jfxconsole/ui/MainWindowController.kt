@@ -59,7 +59,9 @@ class MainWindowController {
         return MethodButton(operation,
                 Runnable {
                     val result = jmxConnector!!.invoke(objectName, operation.name)
-                    MethodInvocationAlert(operation.name, result, operation.returnType == "void").showAndWait()
+                    val alertBox = MethodInvocationAlert(operation.name, result, operation.returnType == "void")
+                    alertBox.initOwner(mainPane!!.scene.window)
+                    alertBox.showAndWait()
                 })
     }
 }
