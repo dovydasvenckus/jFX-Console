@@ -12,13 +12,22 @@ class MethodButton(operation: MBeanOperationInfo, callback: Runnable) : HBox(20.
         val button = Button(operation.name)
         button.setOnAction { callback.run() }
 
-        this.children.add(Text(getReturnTypeName(operation)))
-        this.children.add(button)
+        children.add(Text(getReturnTypeName(operation)))
+        children.add(button)
+        children.add(Text("("))
+        children.add(getMethodOperandsFieldBox(operation))
+        children.add(Text(")"))
+    }
+
+    private fun getMethodOperandsFieldBox(operation: MBeanOperationInfo) : HBox{
+        val operandsBox = HBox()
 
         operation.signature.forEach {
-            this.children.add(Text(getReturnTypeName(it.type)))
-            this.children.add(TextField(it.name))
+            operandsBox.children.add(Text(it.name))
+            operandsBox.children.add(TextField(getReturnTypeName(it.type)))
         }
+
+        return operandsBox
     }
 
 }
