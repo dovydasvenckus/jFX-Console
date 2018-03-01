@@ -4,13 +4,16 @@ import javafx.scene.control.Button
 import javafx.scene.control.TextField
 import javafx.scene.layout.HBox
 import javafx.scene.text.Text
+import java.util.function.Function
 import javax.management.MBeanOperationInfo
 
-class MethodButton(operation: MBeanOperationInfo, callback: Runnable) : HBox(20.0) {
+class MethodButton(operation: MBeanOperationInfo, callback: Function<List<String>, Any>) : HBox(20.0) {
+
+    private val methodOperandsBox = HBox()
 
     init {
         val button = Button(operation.name)
-        button.setOnAction { callback.run() }
+        button.setOnAction { callback.apply(getOperandValues()) }
 
         children.add(Text(getReturnTypeName(operation)))
         children.add(button)
@@ -19,15 +22,19 @@ class MethodButton(operation: MBeanOperationInfo, callback: Runnable) : HBox(20.
         children.add(Text(")"))
     }
 
-    private fun getMethodOperandsFieldBox(operation: MBeanOperationInfo) : HBox{
-        val operandsBox = HBox()
-
+    private fun getMethodOperandsFieldBox(operation: MBeanOperationInfo): HBox {
         operation.signature.forEach {
-            operandsBox.children.add(Text(it.name))
-            operandsBox.children.add(TextField(getReturnTypeName(it.type)))
+            methodOperandsBox.children.add(Text(it.name))
+            methodOperandsBox.children.add(TextField(getReturnTypeName(it.type)))
         }
 
-        return operandsBox
+        return methodOperandsBox
+    }
+
+    private fun getOperandValues(): List<String> {
+        return methodOperandsBox.children
+                .filterIsInstance<TextField>()
+                .map { node -> node.text }
     }
 
 }

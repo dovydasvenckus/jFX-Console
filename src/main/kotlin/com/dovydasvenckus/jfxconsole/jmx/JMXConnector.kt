@@ -25,8 +25,24 @@ class JMXConnector(host: String, port: Int) {
         return mbeanServerConnection.invoke(name, functionName, emptyArray<Any>(), emptyArray<String>())
     }
 
+    fun invoke(name: ObjectName, functionName: String, args: List<String>): Any? {
+        val typedArgs = toObjectArray(args)
+        return mbeanServerConnection.invoke(name, functionName, typedArgs, getParamTypes(typedArgs))
+    }
+
     fun close() {
         jmxConnector.close()
     }
 
+    private fun toObjectArray(list: List<String>): Array<Object> {
+        return list
+                .map { it as Object }
+                .toTypedArray()
+    }
+
+    private fun getParamTypes(params: Array<Object>): Array<String> {
+        return params.map {
+            it.`class`.name
+        }.toTypedArray()
+    }
 }

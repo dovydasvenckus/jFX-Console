@@ -10,14 +10,20 @@ import javafx.geometry.Insets
 import javafx.scene.control.TreeView
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.VBox
+import java.util.function.Function
 import javax.management.MBeanOperationInfo
 import javax.management.ObjectName
 
 
 class MainWindowController {
-    @FXML var mainPane: BorderPane? = null
-    @FXML var mBeansTree: TreeView<MBeanNode>? = null
-    @FXML var methodsVBox: VBox? = null
+    @FXML
+    var mainPane: BorderPane? = null
+
+    @FXML
+    var mBeansTree: TreeView<MBeanNode>? = null
+
+    @FXML
+    var methodsVBox: VBox? = null
 
     var jmxConnector: JMXConnector? = null
 
@@ -57,11 +63,12 @@ class MainWindowController {
 
     private fun createOperationButton(objectName: ObjectName, operation: MBeanOperationInfo): MethodButton {
         return MethodButton(operation,
-                Runnable {
-                    val result = jmxConnector!!.invoke(objectName, operation.name)
-                    val alertBox = MethodInvocationAlert(operation.name, result, operation.returnType == "void")
-                    alertBox.initOwner(mainPane!!.scene.window)
+                Function { args ->
+                    val result = jmxConnector!!.invoke(objectName, operation.name, args)
+                    val alertBox = MethodInvocationAlert(getParentWindow(), operation.name, result, operation.returnType == "void")
                     alertBox.showAndWait()
                 })
     }
+
+    private fun getParentWindow() = mainPane!!.scene.window
 }
